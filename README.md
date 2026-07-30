@@ -3,12 +3,13 @@
 </p>
 
 <p align="center">
-  <strong>把明确选定的 Markdown 重建为受约束、可审计、可恢复的 OWL 本体。</strong><br>
-  <sub>LLM 负责语义提议，确定性 Python 负责准入、身份解析、序列化与验证。</sub>
+  <strong>面向 Codex 等编码 Agent 的 OWL 本体自动生成 Skill。</strong><br>
+  <sub>把明确选定的 Markdown 重建为受约束、可审计、可恢复的 TBox + ABox。</sub>
 </p>
 
 <p align="center">
-  <a href="#快速开始">快速开始</a> ·
+  <a href="#安装">安装</a> ·
+  <a href="#使用">使用</a> ·
   <a href="#真实产出">真实产出</a> ·
   <a href="#工作原理">工作原理</a> ·
   <a href="#核心保证">核心保证</a> ·
@@ -17,12 +18,75 @@
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/Agent_Skill-ontology--auto--generation-6f42c1.svg" alt="Agent Skill: ontology-auto-generation">
+  <img src="https://img.shields.io/badge/Codex-compatible-111827.svg" alt="Codex compatible">
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
 </p>
 
 ---
 
-**OntologyAutoGeneration** 把你**明确选定**的 Markdown 文档完整重建为一份**受约束的 OWL 本体**——`ontology.owl`，包含锁定的模式（TBox）与被接纳的实例和断言（ABox）。一个确定性的 Python 构建器负责身份解析并写出 RDF/XML；每个被接纳的事实附带原文证据旁路，每个拒绝都附带机器可读的原因。
+**OntologyAutoGeneration** 是一个可安装的 [Agent Skill](https://agentskills.io/)。它指导 Agent 将你**明确选定**的 Markdown 文档完整重建为一份**受约束的 OWL 本体**——`ontology.owl`，其中包含锁定的模式（TBox）与被接纳的实例和断言（ABox）。
+
+LLM 负责 CQ、SRD、Schema Card、ABox 和语义 QA；Skill 自带的确定性 Python 工具负责候选准入、身份解析、RDF/XML 序列化与验证。每个被接纳的事实附带原文证据旁路，每个拒绝都附带机器可读的原因。
+
+## 安装
+
+需要 Node.js 18+。使用开放 Agent Skills CLI 安装：
+
+```bash
+npx skills add Ma-benjiang/OntologyAutoGeneration/ontology-auto-generation
+```
+
+安装器会列出本机检测到的兼容 Agent 供你选择。Codex 用户也可以直接执行全局、非交互安装：
+
+```bash
+npx skills add Ma-benjiang/OntologyAutoGeneration/ontology-auto-generation \
+  --global --agent codex --yes
+
+python3 -m pip install -r ~/.codex/skills/ontology-auto-generation/requirements.txt
+```
+
+第一条命令负责安装 Skill；第二条命令补齐其确定性 Python 构建与验证依赖。该 Skill 遵循开放的 [`SKILL.md` 规范](https://agentskills.io/specification)，但当前主要在 Codex 中验证。
+
+<details>
+<summary><strong>从源码安装 / 开发</strong></summary>
+
+```bash
+git clone https://github.com/Ma-benjiang/OntologyAutoGeneration.git
+cd OntologyAutoGeneration
+
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install -r ontology-auto-generation/requirements.txt
+```
+
+</details>
+
+## 使用
+
+在 Codex 的对话中直接点名 Skill（这不是终端命令）：
+
+```text
+$ontology-auto-generation
+请根据 docs/requirements.md 和 docs/data-dictionary.md 生成 OWL 本体，
+输出到 ontology-output/，并保留逐事实证据与拒绝原因。
+```
+
+也可以用自然语言描述同类任务，让 Codex 根据 Skill 的 `description` 自动匹配。建议在提示中明确：
+
+- **来源**：一个或多个 workspace 内的 Markdown 文件；
+- **输出目录**：本次重建产物写到哪里；
+- **业务标识**：若文档中存在稳定 ID，说明其字段含义；
+- **目标 IRI**：未指定时由流程生成中性的项目 IRI，不使用来源文档中的品牌域名。
+
+Skill 会按 **CQ → SRD → Schema Card → ABox → Build → QA → Fixer** 执行完整重建，最终交付：
+
+| 产物 | 说明 |
+|---|---|
+| `ontology.owl` | 唯一正式交付，包含 TBox + ABox |
+| `evidence.jsonl` | 每个被接纳实体与事实的原文证据 |
+| `rejections.jsonl` | 未接纳候选及机器可读原因 |
+| `qa_report.json` | 语义、RDF、OWL-RL 与 SHACL 检查结果 |
 
 它不是开放式三元组生成器：Schema Card 会先锁定允许的类、属性和数据类型，之后所有 ABox 候选都必须通过证据、身份、domain/range、XSD 和 OWL Profile 检查。
 
@@ -40,20 +104,9 @@
 | 需要 RDF/XML、OWL-RL 与 SHACL 验证 | 完整 OWL 2 DL 推理或人工本体编辑器 |
 | 需要完整重建、可恢复执行和可审计交付 | 增量缓存式知识图谱同步 |
 
-## 快速开始
+## 本地验证与手动运行
 
-### 1. 安装
-
-```bash
-git clone https://github.com/Ma-benjiang/OntologyAutoGeneration.git
-cd OntologyAutoGeneration
-
-python3 -m venv .venv
-source .venv/bin/activate
-python3 -m pip install -r ontology-auto-generation/requirements.txt
-```
-
-### 2. 验证确定性核心
+### 验证确定性核心
 
 下面的测试覆盖候选准入、稳定身份、RDF/XML 构建和确定性 OWL Profile 校验：
 
@@ -63,7 +116,7 @@ python3 -m unittest ontology-auto-generation/tests/test_ontology_pipeline.py -q
 
 预期以 `OK` 结束。
 
-### 3. 启动一次完整重建
+### 启动一次完整重建
 
 `run start` 只接受你显式指定的 workspace 内 Markdown，不会自动扫描目录：
 
