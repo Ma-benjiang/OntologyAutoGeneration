@@ -48,20 +48,6 @@ python3 -m pip install -r ~/.codex/skills/ontology-auto-generation/requirements.
 
 第一条命令负责安装 Skill；第二条命令补齐其确定性 Python 构建与验证依赖。该 Skill 遵循开放的 [`SKILL.md` 规范](https://agentskills.io/specification)，但当前主要在 Codex 中验证。
 
-<details>
-<summary><strong>从源码安装 / 开发</strong></summary>
-
-```bash
-git clone https://github.com/Ma-benjiang/OntologyAutoGeneration.git
-cd OntologyAutoGeneration
-
-python3 -m venv .venv
-source .venv/bin/activate
-python3 -m pip install -r ontology-auto-generation/requirements.txt
-```
-
-</details>
-
 ## 使用
 
 在 Codex 的对话中直接点名 Skill（这不是终端命令）：
@@ -103,55 +89,6 @@ Skill 会按 **CQ → SRD → Schema Card → ABox → Build → QA → Fixer** 
 | 需要逐事实证据、拒绝原因和稳定实例身份 | 无约束开放信息抽取或概率式三元组堆叠 |
 | 需要 RDF/XML、OWL-RL 与 SHACL 验证 | 完整 OWL 2 DL 推理或人工本体编辑器 |
 | 需要完整重建、可恢复执行和可审计交付 | 增量缓存式知识图谱同步 |
-
-## 本地验证与手动运行
-
-### 验证确定性核心
-
-下面的测试覆盖候选准入、稳定身份、RDF/XML 构建和确定性 OWL Profile 校验：
-
-```bash
-python3 -m unittest ontology-auto-generation/tests/test_ontology_pipeline.py -q
-```
-
-预期以 `OK` 结束。
-
-### 启动一次完整重建
-
-`run start` 只接受你显式指定的 workspace 内 Markdown，不会自动扫描目录：
-
-```bash
-PIPELINE=ontology-auto-generation/scripts/ontology_pipeline.py
-
-python3 "$PIPELINE" run start \
-  --workspace . \
-  --output demo-output \
-  --source CONTEXT.md
-
-python3 "$PIPELINE" run status --output demo-output --json
-```
-
-这会创建可恢复的运行状态和第一个语义 Work Item。仓库本身不内置模型调用器；CQ、SRD、Schema Card、ABox、QA 与 Fixer 的语义结果由 LLM 按 [`ontology-auto-generation/SKILL.md`](./ontology-auto-generation/SKILL.md) 契约生成，再通过 `run submit` 提交。Python 会在每次状态推进前验证契约和输入摘要。
-
-<details>
-<summary><strong>查看完整运行生命周期命令</strong></summary>
-
-```bash
-# 提交当前语义 Work Item 的结果
-python3 "$PIPELINE" run submit \
-  --output demo-output \
-  --work-item-id <id> \
-  --input-digest <sha256> \
-  --result <result-file>
-
-# 崩溃后恢复，或主动中止
-python3 "$PIPELINE" run resume --output demo-output
-python3 "$PIPELINE" run abort  --output demo-output
-```
-
-开发调试时也可以直接调用 `resolve`、`build` 和 `validate.py`；完整参数和契约见 [Skill 操作手册](./ontology-auto-generation/SKILL.md)。
-
-</details>
 
 ## 真实产出
 
@@ -283,15 +220,9 @@ output/
 - [**Skill 操作手册**](./ontology-auto-generation/SKILL.md) —— 七个角色、严格 JSON 契约、身份规则、QA 与可恢复运行。
 - [**研究记录**](./docs/research/) —— 同类项目、技术选型与 README 信息架构调研。
 
-## 开发与贡献
+## 反馈与贡献
 
-运行完整测试集：
-
-```bash
-python3 -m unittest discover -s ontology-auto-generation/tests -v
-```
-
-提交改动前请保持现有契约、黄金样例与生命周期测试通过。问题与改进建议可提交到 [GitHub Issues](https://github.com/Ma-benjiang/OntologyAutoGeneration/issues)，代码改动可通过 Pull Request 讨论。
+问题与改进建议可提交到 [GitHub Issues](https://github.com/Ma-benjiang/OntologyAutoGeneration/issues)，代码改动可通过 Pull Request 讨论。
 
 ## 致谢
 
