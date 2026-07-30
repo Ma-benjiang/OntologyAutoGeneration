@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/coverage-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "status", "expected_chunk_ids", "completed_chunk_ids", "failed_chunk_ids"],
+  "properties": {
+    "version": { "const": 1 },
+    "status": { "enum": ["COMPLETE", "INCOMPLETE", "UNKNOWN"] },
+    "expected_chunk_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "completed_chunk_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "failed_chunk_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+  }
+}

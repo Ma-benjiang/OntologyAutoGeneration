@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/failed-chunk-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version", "chunk_id", "source_path", "chunk_ordinal", "failed_stage", "reason_code",
+    "reported_code", "counters", "attempt_ids"
+  ],
+  "properties": {
+    "version": { "const": 1 },
+    "chunk_id": { "type": "string", "minLength": 1 },
+    "source_path": { "type": "string", "minLength": 1 },
+    "chunk_ordinal": { "type": "integer", "minimum": 1 },
+    "failed_stage": { "enum": ["ENTITY", "ASSERTION", "CRITIC"] },
+    "reason_code": {
+      "enum": [
+        "CHUNK_INPUT_INVALID", "PASS_REPORTED_RETRYABLE_FAILURE", "NO_RESPONSE", "TIMEOUT",
+        "TOOL_INTERRUPTED", "INVALID_JSON", "SCHEMA_VIOLATION", "CRITIC_REVIEW_INCOMPLETE",
+        "REEXTRACTION_NO_CHANGE", "REEXTRACTION_BUDGET_EXHAUSTED"
+      ]
+    },
+    "reported_code": { "oneOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+    "counters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["execution_attempts", "semantic_reextractions"],
+      "properties": {
+        "execution_attempts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ENTITY", "ASSERTION", "CRITIC"],
+          "properties": {
+            "ENTITY": { "type": "integer", "minimum": 0 },
+            "ASSERTION": { "type": "integer", "minimum": 0 },
+            "CRITIC": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "semantic_reextractions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ENTITY", "ASSERTION"],
+          "properties": {
+            "ENTITY": { "type": "integer", "minimum": 0, "maximum": 1 },
+            "ASSERTION": { "type": "integer", "minimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    },
+    "attempt_ids": { "type": "array", "items": { "type": "string", "pattern": "^attempt-v1-[0-9a-f]{64}$" }, "uniqueItems": true }
+  }
+}

@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="440" viewBox="0 0 1200 440" role="img" aria-labelledby="pt pd">
+  <title id="pt">一次完整重建的流转</title>
+  <desc id="pd">七个角色：CQ、SRD、Schema Card、ABox 抽取、确定性的本体构建师、三闸门 QA、修复专家，循环直至 OWL 通过。</desc>
+  <rect width="1200" height="440" rx="24" fill="#0E1A24"/>
+<text x="56" y="60" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="28" font-weight="700" fill="#E8F0F7">一次完整重建的流转</text>
+<text x="56" y="88" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="15" fill="#8FA3B5">CQ → SRD → Schema Card → ABox → Build → QA ⇄ Fixer</text>
+<g transform="translate(820 50)">
+  <rect width="14" height="14" rx="3" fill="#5BC8E72e" stroke="#5BC8E7"/>
+  <text x="22" y="12" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#8FA3B5">LLM 语义阶段</text>
+  <rect x="150" y="0" width="14" height="14" rx="3" fill="#4DD58B2e" stroke="#4DD58B"/>
+  <text x="172" y="12" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#8FA3B5">确定性 Python</text>
+</g>
+<g transform="translate(88 150)"><rect width="140" height="34" rx="8" fill="#1E2E3A" stroke="#2A3C4A"/><text x="70" y="22" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#E8F0F7">📄 Markdown 源文档</text></g>
+<path d="M158 184 L158 206" stroke="#2A3C4A" stroke-width="2" marker-end="url(#arr)"/>
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#8FA3B5"/></marker>
+  <marker id="arrP" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#4DD58B"/></marker>
+  <marker id="arrA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#F2B964"/></marker>
+</defs>
+<g transform="translate(88 206)"><rect width="140" height="98" rx="12" fill="#5BC8E714" stroke="#5BC8E7"/>
+<circle cx="22" cy="22" r="13" fill="#0E1A24" stroke="#5BC8E7"/><text x="22" y="27" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="700" fill="#5BC8E7">1</text>
+<text x="14" y="58" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="17" font-weight="700" fill="#E8F0F7">CQ</text>
+<text x="14" y="78" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" fill="#8FA3B5">能力问题生成</text>
+<text x="14" y="88" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11.5" fill="#E8F0F7b3">cqs.md</text>
+</g>
+<path d="M230 255 L236 255" stroke="#8FA3B5" stroke-width="2" marker-end="url(#arr)"/>
+<g transform="translate(236 206)"><rect width="140" height="98" rx="12" fill="#5BC8E714" stroke="#5BC8E7"/>
+<circle cx="22" cy="22" r="13" fill="#0E1A24" stroke="#5BC8E7"/><text x="22" y="27" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="700" fill="#5BC8E7">2</text>
+<text x="14" y="58" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="17" font-weight="700" fill="#E8F0F7">SRD</text>
+<text x="14" y="78" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" fill="#8FA3B5">领域分析师</text>
+<text x="14" y="88" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11.5" fill="#E8F0F7b3">srd.md</text>
+</g>
+<path d="M378 255 L384 255" stroke="#8FA3B5" stroke-width="2" marker-end="url(#arr)"/>
+<g transform="translate(384 206)"><rect width="140" height="98" rx="12" fill="#F2B9641a" stroke="#F2B964"/>
+<circle cx="22" cy="22" r="13" fill="#0E1A24" stroke="#F2B964"/><text x="22" y="27" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="700" fill="#F2B964">3</text>
+<g transform="translate(110 14)" stroke="#F2B964" fill="none"><rect x="0" y="6" width="16" height="11" rx="2"/><path d="M3 6 V4 a5 5 0 0 1 10 0 V6"/></g>
+<text x="14" y="58" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="17" font-weight="700" fill="#E8F0F7">Schema</text>
+<text x="14" y="78" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" fill="#8FA3B5">本体架构师</text>
+<text x="14" y="88" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11.5" fill="#E8F0F7b3">schema_card.json</text>
+</g>
+<path d="M526 255 L532 255" stroke="#8FA3B5" stroke-width="2" marker-end="url(#arr)"/>
+<g transform="translate(532 206)"><rect width="140" height="98" rx="12" fill="#5BC8E714" stroke="#5BC8E7"/>
+<circle cx="22" cy="22" r="13" fill="#0E1A24" stroke="#5BC8E7"/><text x="22" y="27" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="700" fill="#5BC8E7">4</text>
+<text x="14" y="58" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="17" font-weight="700" fill="#E8F0F7">ABox</text>
+<text x="14" y="78" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" fill="#8FA3B5">实例抽取师</text>
+<text x="14" y="88" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11.5" fill="#E8F0F7b3">candidates.json</text>
+</g>
+<path d="M674 255 L680 255" stroke="#8FA3B5" stroke-width="2" marker-end="url(#arr)"/>
+<g transform="translate(680 206)"><rect width="140" height="98" rx="12" fill="#4DD58B1a" stroke="#4DD58B"/>
+<circle cx="22" cy="22" r="13" fill="#0E1A24" stroke="#4DD58B"/><text x="22" y="27" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="700" fill="#4DD58B">5</text>
+<text x="14" y="58" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="17" font-weight="700" fill="#E8F0F7">Build</text>
+<text x="14" y="78" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" fill="#8FA3B5">本体构建师</text>
+<text x="14" y="88" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11.5" fill="#E8F0F7b3">resolve · build</text>
+</g>
+<path d="M822 255 L828 255" stroke="#8FA3B5" stroke-width="2" marker-end="url(#arr)"/>
+<g transform="translate(828 206)"><rect width="140" height="98" rx="12" fill="#4DD58B1a" stroke="#4DD58B"/>
+<circle cx="22" cy="22" r="13" fill="#0E1A24" stroke="#4DD58B"/><text x="22" y="27" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="700" fill="#4DD58B">6</text>
+<text x="14" y="58" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="17" font-weight="700" fill="#E8F0F7">QA</text>
+<text x="14" y="78" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" fill="#8FA3B5">三闸门审查</text>
+<text x="14" y="88" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11.5" fill="#E8F0F7b3">qa_report.json</text>
+</g>
+<path d="M970 255 L976 255" stroke="#8FA3B5" stroke-width="2" marker-end="url(#arr)"/>
+<g transform="translate(976 206)"><rect width="140" height="98" rx="12" fill="#5BC8E714" stroke="#5BC8E7"/>
+<circle cx="22" cy="22" r="13" fill="#0E1A24" stroke="#5BC8E7"/><text x="22" y="27" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="700" fill="#5BC8E7">7</text>
+<text x="14" y="58" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="17" font-weight="700" fill="#E8F0F7">Fixer</text>
+<text x="14" y="78" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" fill="#8FA3B5">修复专家</text>
+<text x="14" y="88" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11.5" fill="#E8F0F7b3">replacement.json</text>
+</g>
+<path d="M750 304 L750 330" stroke="#F2B964" stroke-width="2" marker-end="url(#arrA)"/>
+<g transform="translate(674 334)"><rect width="74" height="26" rx="7" fill="#F2B96421" stroke="#F2B96480"/><text x="37" y="18" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#F2B964">证据</text></g>
+<g transform="translate(752 334)"><rect width="80" height="26" rx="7" fill="#1E2E3A" stroke="#2A3C4A"/><text x="40" y="18" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#8FA3B5">拒绝</text></g>
+<path d="M877 206 C 877 184, 1067 184, 1067 206" fill="none" stroke="#5BC8E7" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+<text x="972" y="178" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5BC8E7">重建并重审</text>
+<path d="M898 304 L898 330" stroke="#4DD58B" stroke-width="2" marker-end="url(#arrP)"/>
+<g transform="translate(828 334)"><rect width="140" height="26" rx="7" fill="#4DD58B24" stroke="#4DD58B99"/><text x="70" y="18" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" fill="#4DD58B">交付 ontology.owl</text></g>
+</svg>

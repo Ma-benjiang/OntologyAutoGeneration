@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/assertion-pass-output-v1.json",
+  "title": "ABox Assertion Pass Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "chunk_id", "status", "assertions", "exclusions", "failure"],
+  "properties": {
+    "version": { "const": 1 },
+    "chunk_id": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["complete", "retryable_failure"] },
+    "assertions": { "type": "array", "items": { "$ref": "#/$defs/assertion" } },
+    "exclusions": { "type": "array", "items": { "$ref": "#/$defs/exclusion" } },
+    "failure": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/failure" }] }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "complete" } }, "required": ["status"] },
+      "then": { "properties": { "failure": { "type": "null" } } }
+    },
+    {
+      "if": { "properties": { "status": { "const": "retryable_failure" } }, "required": ["status"] },
+      "then": {
+        "properties": {
+          "assertions": { "maxItems": 0 },
+          "exclusions": { "maxItems": 0 },
+          "failure": { "$ref": "#/$defs/failure" }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "candidateId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.:-]+\\.entity\\.[0-9]{3}$"
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "heading_path", "line_start", "line_end", "quote"],
+      "properties": {
+        "source": { "type": "string", "minLength": 1 },
+        "heading_path": { "type": "array", "items": { "type": "string" } },
+        "line_start": { "type": "integer", "minimum": 1 },
+        "line_end": { "type": "integer", "minimum": 1 },
+        "quote": { "type": "string", "minLength": 1 }
+      }
+    },
+    "assertion": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "candidate_id", "kind", "subject_candidate_id", "property_iri",
+            "object_candidate_id", "evidence"
+          ],
+          "properties": {
+            "candidate_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.:-]+\\.assertion\\.[0-9]{3}$"
+            },
+            "kind": { "const": "object" },
+            "subject_candidate_id": { "$ref": "#/$defs/candidateId" },
+            "property_iri": { "type": "string", "format": "uri" },
+            "object_candidate_id": { "$ref": "#/$defs/candidateId" },
+            "evidence": { "$ref": "#/$defs/evidence" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "candidate_id", "kind", "subject_candidate_id", "property_iri",
+            "value", "datatype", "evidence"
+          ],
+          "properties": {
+            "candidate_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.:-]+\\.assertion\\.[0-9]{3}$"
+            },
+            "kind": { "const": "data" },
+            "subject_candidate_id": { "$ref": "#/$defs/candidateId" },
+            "property_iri": { "type": "string", "format": "uri" },
+            "value": { "type": "string", "minLength": 1 },
+            "datatype": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^http://www\\.w3\\.org/2001/XMLSchema#"
+            },
+            "evidence": { "$ref": "#/$defs/evidence" }
+          }
+        }
+      ]
+    },
+    "exclusion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exclusion_id", "reason", "candidate_ids", "property_iri", "detail", "evidence"],
+      "properties": {
+        "exclusion_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]+\\.exclusion\\.[0-9]{3}$"
+        },
+        "reason": {
+          "enum": [
+            "NEGATED_STATEMENT",
+            "EXAMPLE_OR_HYPOTHETICAL",
+            "GENERIC_OR_NORMATIVE_STATEMENT",
+            "UNLOCKED_ENTITY_REFERENCE",
+            "ENTITY_REFERENCE_AMBIGUOUS",
+            "PROPERTY_AMBIGUOUS",
+            "LITERAL_NOT_SCHEMA_TYPED"
+          ]
+        },
+        "candidate_ids": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/candidateId" },
+          "uniqueItems": true
+        },
+        "property_iri": {
+          "oneOf": [{ "type": "string", "format": "uri" }, { "type": "null" }]
+        },
+        "detail": { "type": "string", "minLength": 1 },
+        "evidence": { "$ref": "#/$defs/evidence" }
+      }
+    },
+    "failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "detail"],
+      "properties": {
+        "code": {
+          "enum": [
+            "INPUT_INCOMPLETE",
+            "SCHEMA_CARD_INCONSISTENT",
+            "CHUNK_PROVENANCE_INCONSISTENT",
+            "ENTITY_TABLE_INCONSISTENT"
+          ]
+        },
+        "detail": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/ontology-schema-card-v1.json",
+  "title": "Ontology Schema Card",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "ontology_iri",
+    "entity_namespace",
+    "classes",
+    "object_properties",
+    "datatype_properties"
+  ],
+  "properties": {
+    "version": { "const": 1 },
+    "ontology_iri": { "type": "string", "format": "uri" },
+    "entity_namespace": { "type": "string", "format": "uri", "pattern": "#$" },
+    "classes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/class" }
+    },
+    "object_properties": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/objectProperty" }
+    },
+    "datatype_properties": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/datatypeProperty" }
+    }
+  },
+  "$defs": {
+    "termBase": {
+      "type": "object",
+      "required": ["iri", "label", "comment"],
+      "properties": {
+        "iri": { "type": "string", "format": "uri" },
+        "label": { "type": "string", "minLength": 1 },
+        "comment": { "type": "string", "minLength": 1 }
+      }
+    },
+    "class": {
+      "allOf": [
+        { "$ref": "#/$defs/termBase" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "iri",
+            "label",
+            "comment",
+            "superclasses",
+            "equivalent_classes",
+            "disjoint_with"
+          ],
+          "properties": {
+            "iri": { "type": "string", "format": "uri" },
+            "label": { "type": "string", "minLength": 1 },
+            "comment": { "type": "string", "minLength": 1 },
+            "superclasses": { "type": "array", "items": { "type": "string", "format": "uri" }, "uniqueItems": true },
+            "equivalent_classes": { "type": "array", "items": { "type": "string", "format": "uri" }, "uniqueItems": true },
+            "disjoint_with": { "type": "array", "items": { "type": "string", "format": "uri" }, "uniqueItems": true }
+          }
+        }
+      ]
+    },
+    "propertyBase": {
+      "allOf": [
+        { "$ref": "#/$defs/termBase" },
+        {
+          "type": "object",
+          "required": ["domain", "subproperty_of", "equivalent_properties"],
+          "properties": {
+            "domain": { "type": "string", "format": "uri" },
+            "subproperty_of": { "type": "array", "items": { "type": "string", "format": "uri" }, "uniqueItems": true },
+            "equivalent_properties": { "type": "array", "items": { "type": "string", "format": "uri" }, "uniqueItems": true },
+            "max_count": { "type": "integer", "minimum": 1 }
+          }
+        }
+      ]
+    },
+    "objectProperty": {
+      "allOf": [
+        { "$ref": "#/$defs/propertyBase" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "iri",
+            "label",
+            "comment",
+            "domain",
+            "range",
+            "subproperty_of",
+            "equivalent_properties",
+            "inverse_of"
+          ],
+          "properties": {
+            "iri": { "type": "string", "format": "uri" },
+            "label": { "type": "string", "minLength": 1 },
+            "comment": { "type": "string", "minLength": 1 },
+            "domain": { "type": "string", "format": "uri" },
+            "range": { "type": "string", "format": "uri" },
+            "subproperty_of": { "type": "array", "items": { "type": "string", "format": "uri" }, "uniqueItems": true },
+            "equivalent_properties": { "type": "array", "items": { "type": "string", "format": "uri" }, "uniqueItems": true },
+            "inverse_of": { "type": "array", "items": { "type": "string", "format": "uri" }, "uniqueItems": true },
+            "max_count": { "type": "integer", "minimum": 1 }
+          }
+        }
+      ]
+    },
+    "datatypeProperty": {
+      "allOf": [
+        { "$ref": "#/$defs/propertyBase" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "iri",
+            "label",
+            "comment",
+            "domain",
+            "range",
+            "subproperty_of",
+            "equivalent_properties",
+            "identity"
+          ],
+          "properties": {
+            "iri": { "type": "string", "format": "uri" },
+            "label": { "type": "string", "minLength": 1 },
+            "comment": { "type": "string", "minLength": 1 },
+            "domain": { "type": "string", "format": "uri" },
+            "range": { "type": "string", "format": "uri", "pattern": "^http://www\\.w3\\.org/2001/XMLSchema#" },
+            "subproperty_of": { "type": "array", "items": { "type": "string", "format": "uri" }, "uniqueItems": true },
+            "equivalent_properties": { "type": "array", "items": { "type": "string", "format": "uri" }, "uniqueItems": true },
+            "max_count": { "type": "integer", "minimum": 1 },
+            "identity": { "type": "boolean" }
+          }
+        }
+      ]
+    }
+  }
+}

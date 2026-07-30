@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/qa-gate1-output-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "round", "status", "findings"],
+  "properties": {
+    "version": { "const": 1 },
+    "round": { "type": "integer", "minimum": 1, "maximum": 20 },
+    "status": { "enum": ["PASS", "FAIL"] },
+    "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } }
+  },
+  "$defs": {
+    "finding": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reason_code", "target", "detail"],
+          "properties": {
+            "reason_code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+            "target": { "enum": ["CQ", "SRD", "SCHEMA_CARD", "UNLOCATED"] },
+            "detail": { "type": "string", "minLength": 1 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reason_code", "target", "chunk_id", "detail"],
+          "properties": {
+            "reason_code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+            "target": { "const": "ABOX_CHUNK" },
+            "chunk_id": { "type": "string", "minLength": 1 },
+            "detail": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    }
+  }
+}

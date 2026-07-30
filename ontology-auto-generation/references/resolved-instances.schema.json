@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/resolved-instances-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "ontology_iri", "entity_namespace", "schema_card_sha256", "individuals", "assertions"],
+  "properties": {
+    "version": { "const": 1 },
+    "ontology_iri": { "type": "string", "format": "uri" },
+    "entity_namespace": { "type": "string", "format": "uri", "pattern": "#$" },
+    "schema_card_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "individuals": { "type": "array", "items": { "$ref": "#/$defs/individual" } },
+    "assertions": { "type": "array", "items": { "$ref": "#/$defs/assertion" } }
+  },
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "heading_path", "line_start", "line_end", "quote"],
+      "properties": {
+        "source": { "type": "string", "minLength": 1 },
+        "heading_path": { "type": "array", "items": { "type": "string" } },
+        "line_start": { "type": "integer", "minimum": 1 },
+        "line_end": { "type": "integer", "minimum": 1 },
+        "quote": { "type": "string", "minLength": 1 }
+      }
+    },
+    "alias": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["alias_id", "name", "candidate_ids", "evidence_records"],
+      "properties": {
+        "alias_id": { "type": "string", "pattern": "^alias-v1-[0-9a-f]{64}$" },
+        "name": { "type": "string", "minLength": 1 },
+        "candidate_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1, "uniqueItems": true },
+        "evidence_records": { "type": "array", "items": { "$ref": "#/$defs/evidence" }, "minItems": 1 }
+      }
+    },
+    "individual": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["iri", "class_iri", "label", "identity", "type_fact_id", "label_fact_id", "candidate_ids", "observed_aliases"],
+      "properties": {
+        "iri": { "type": "string", "format": "uri", "pattern": "#I_[0-9a-f]{64}$" },
+        "class_iri": { "type": "string", "format": "uri" },
+        "label": { "type": "string", "minLength": 1 },
+        "identity": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind"],
+              "properties": { "kind": { "const": "business" } }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "source"],
+              "properties": {
+                "kind": { "const": "source" },
+                "source": { "type": "string", "minLength": 1 }
+              }
+            }
+          ]
+        },
+        "type_fact_id": { "type": "string", "pattern": "^fact-v1-[0-9a-f]{64}$" },
+        "label_fact_id": { "type": "string", "pattern": "^fact-v1-[0-9a-f]{64}$" },
+        "candidate_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1, "uniqueItems": true },
+        "observed_aliases": { "type": "array", "items": { "$ref": "#/$defs/alias" } },
+        "business_identifier": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["property_iri", "value"],
+          "properties": {
+            "property_iri": { "type": "string", "format": "uri" },
+            "value": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "objectAssertion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "subject_iri", "property_iri", "object_iri", "fact_id", "candidate_ids"],
+      "properties": {
+        "kind": { "const": "object" },
+        "subject_iri": { "type": "string", "format": "uri" },
+        "property_iri": { "type": "string", "format": "uri" },
+        "object_iri": { "type": "string", "format": "uri" },
+        "fact_id": { "type": "string", "pattern": "^fact-v1-[0-9a-f]{64}$" },
+        "candidate_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1, "uniqueItems": true }
+      }
+    },
+    "dataAssertion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "subject_iri", "property_iri", "value", "datatype", "fact_id", "candidate_ids"],
+      "properties": {
+        "kind": { "const": "data" },
+        "subject_iri": { "type": "string", "format": "uri" },
+        "property_iri": { "type": "string", "format": "uri" },
+        "value": { "type": "string" },
+        "datatype": { "type": "string", "format": "uri" },
+        "fact_id": { "type": "string", "pattern": "^fact-v1-[0-9a-f]{64}$" },
+        "candidate_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1, "uniqueItems": true }
+      }
+    },
+    "assertion": { "oneOf": [{ "$ref": "#/$defs/objectAssertion" }, { "$ref": "#/$defs/dataAssertion" }] }
+  }
+}

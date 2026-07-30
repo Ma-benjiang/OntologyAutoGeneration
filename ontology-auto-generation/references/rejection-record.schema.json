@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/rejection-record-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["candidate_id", "candidate_kind", "reasons"],
+  "properties": {
+    "candidate_id": { "type": "string", "minLength": 1 },
+    "candidate_kind": { "enum": ["entity", "assertion"] },
+    "reasons": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": { "$ref": "#/$defs/reason" }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "heading_path", "line_start", "line_end", "quote"],
+      "properties": {
+        "source": { "type": "string", "minLength": 1 },
+        "heading_path": { "type": "array", "items": { "type": "string" } },
+        "line_start": { "type": "integer", "minimum": 1 },
+        "line_end": { "type": "integer", "minimum": 1 },
+        "quote": { "type": "string", "minLength": 1 }
+      }
+    },
+    "context": {
+      "oneOf": [
+        { "$ref": "#/$defs/identityConflictContext" },
+        { "$ref": "#/$defs/subjectDependencyContext" },
+        { "$ref": "#/$defs/objectDependencyContext" },
+        { "$ref": "#/$defs/maxCountContext" }
+      ]
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["review_id", "reason_code", "evidence"],
+      "properties": {
+        "review_id": { "type": "string", "pattern": "^review-v1-[0-9a-f]{64}$" },
+        "reason_code": { "enum": ["NEGATED_ASSERTION", "EXAMPLE_OR_HYPOTHETICAL", "GENERIC_OR_NORMATIVE", "UNSUPPORTED_BY_PRIMARY"] },
+        "evidence": { "$ref": "#/$defs/evidence" },
+        "detail": { "type": "string", "minLength": 1 }
+      }
+    }
+  },
+  "$defs": {
+    "reason": {
+      "enum": [
+        "ENTITY_CONTRACT_INVALID", "ENTITY_CANDIDATE_ID_INVALID", "ENTITY_CANDIDATE_ID_DUPLICATE",
+        "ENTITY_CLASS_UNDECLARED", "ENTITY_NAME_INVALID", "ENTITY_EVIDENCE_INVALID",
+        "ENTITY_BUSINESS_IDENTIFIER_INVALID", "IDENTITY_CLASS_CONFLICT",
+        "ASSERTION_CONTRACT_INVALID", "ASSERTION_CANDIDATE_ID_INVALID", "ASSERTION_CANDIDATE_ID_DUPLICATE",
+        "ASSERTION_SUBJECT_UNRESOLVED", "ASSERTION_PROPERTY_INVALID", "ASSERTION_DOMAIN_MISMATCH",
+        "ASSERTION_EVIDENCE_INVALID", "ASSERTION_OBJECT_UNRESOLVED", "ASSERTION_RANGE_MISMATCH",
+        "ASSERTION_LITERAL_INVALID", "MAX_COUNT_CONFLICT",
+        "CRITIC_NEGATED_ASSERTION", "CRITIC_EXAMPLE_OR_HYPOTHETICAL",
+        "CRITIC_GENERIC_OR_NORMATIVE", "CRITIC_UNSUPPORTED_BY_PRIMARY"
+      ]
+    },
+    "entityReason": {
+      "enum": [
+        "ENTITY_CONTRACT_INVALID", "ENTITY_CANDIDATE_ID_INVALID", "ENTITY_CANDIDATE_ID_DUPLICATE",
+        "ENTITY_CLASS_UNDECLARED", "ENTITY_NAME_INVALID", "ENTITY_EVIDENCE_INVALID",
+        "ENTITY_BUSINESS_IDENTIFIER_INVALID", "IDENTITY_CLASS_CONFLICT", "ENTITY_NOT_RESOLVED"
+      ]
+    },
+    "identityConflictContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conflict_id", "class_iris", "candidate_ids"],
+      "properties": {
+        "conflict_id": { "type": "string", "pattern": "^conflict-v1-[0-9a-f]{64}$" },
+        "class_iris": { "type": "array", "items": { "type": "string", "format": "uri" }, "minItems": 2, "uniqueItems": true },
+        "candidate_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 2, "uniqueItems": true }
+      }
+    },
+    "subjectDependencyContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject_candidate_id", "subject_reasons", "subject_context"],
+      "properties": {
+        "subject_candidate_id": { "type": "string", "minLength": 1 },
+        "subject_reasons": { "type": "array", "items": { "$ref": "#/$defs/entityReason" }, "minItems": 1, "maxItems": 1 },
+        "subject_context": { "oneOf": [{ "$ref": "#/$defs/identityConflictContext" }, { "type": "null" }] }
+      }
+    },
+    "objectDependencyContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["object_candidate_id", "object_reasons", "object_context"],
+      "properties": {
+        "object_candidate_id": { "type": "string", "minLength": 1 },
+        "object_reasons": { "type": "array", "items": { "$ref": "#/$defs/entityReason" }, "minItems": 1, "maxItems": 1 },
+        "object_context": { "oneOf": [{ "$ref": "#/$defs/identityConflictContext" }, { "type": "null" }] }
+      }
+    },
+    "maxCountContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conflict_id", "constraint_kind", "constraint_subject", "constraint_property_iri", "max_count", "values", "candidate_ids", "conflict_ids"],
+      "properties": {
+        "conflict_id": { "type": "string", "pattern": "^conflict-v1-[0-9a-f]{64}$" },
+        "constraint_kind": { "enum": ["object", "data"] },
+        "constraint_subject": { "type": "string", "format": "uri" },
+        "constraint_property_iri": { "type": "string", "format": "uri" },
+        "max_count": { "type": "integer", "minimum": 1 },
+        "values": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "type": "array", "items": { "type": "string" }, "minItems": 1, "maxItems": 2 }
+        },
+        "candidate_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 2, "uniqueItems": true },
+        "conflict_ids": { "type": "array", "items": { "type": "string", "pattern": "^conflict-v1-[0-9a-f]{64}$" }, "minItems": 1, "uniqueItems": true }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "heading_path", "line_start", "line_end", "quote"],
+      "properties": {
+        "source": { "type": "string", "minLength": 1 },
+        "heading_path": { "type": "array", "items": { "type": "string" } },
+        "line_start": { "type": "integer", "minimum": 1 },
+        "line_end": { "type": "integer", "minimum": 1 },
+        "quote": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

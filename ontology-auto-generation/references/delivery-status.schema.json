@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/delivery-status-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version", "delivery_status", "coverage", "reason_codes", "failed_chunk_count", "qa_rounds",
+    "ontology_iri", "ontology_path", "ontology_sha256"
+  ],
+  "properties": {
+    "version": { "const": 1 },
+    "delivery_status": { "enum": ["PASS", "FORCED_WITH_ERRORS", "FAILED"] },
+    "coverage": { "enum": ["UNKNOWN", "COMPLETE", "INCOMPLETE"] },
+    "reason_codes": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "FAILED_CHUNKS_PRESENT", "QA_REPAIR_BUDGET_EXHAUSTED", "SCHEMA_CARD_NOT_LOCKED",
+          "SCHEMA_CARD_INVALID", "CHUNK_MANIFEST_INVALID", "STATE_LEDGER_INVALID",
+          "ONTOLOGY_NOT_PARSEABLE", "ORCHESTRATION_ABORTED"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "failed_chunk_count": { "type": "integer", "minimum": 0 },
+    "qa_rounds": { "type": "integer", "minimum": 0, "maximum": 20 },
+    "ontology_iri": { "oneOf": [{ "type": "string", "format": "uri" }, { "type": "null" }] },
+    "ontology_path": { "oneOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+    "ontology_sha256": { "oneOf": [{ "type": "string", "pattern": "^[0-9a-f]{64}$" }, { "type": "null" }] }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/entity-pass-output-v1.json",
+  "title": "ABox Entity Pass Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "chunk_id", "status", "entities", "ambiguities", "failure"],
+  "properties": {
+    "version": { "const": 1 },
+    "chunk_id": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["complete", "retryable_failure"] },
+    "entities": { "type": "array", "items": { "$ref": "#/$defs/entity" } },
+    "ambiguities": { "type": "array", "items": { "$ref": "#/$defs/ambiguity" } },
+    "failure": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/failure" }] }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "complete" } }, "required": ["status"] },
+      "then": { "properties": { "failure": { "type": "null" } } }
+    },
+    {
+      "if": { "properties": { "status": { "const": "retryable_failure" } }, "required": ["status"] },
+      "then": {
+        "properties": {
+          "entities": { "maxItems": 0 },
+          "ambiguities": { "maxItems": 0 },
+          "failure": { "$ref": "#/$defs/failure" }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "heading_path", "line_start", "line_end", "quote"],
+      "properties": {
+        "source": { "type": "string", "minLength": 1 },
+        "heading_path": { "type": "array", "items": { "type": "string" } },
+        "line_start": { "type": "integer", "minimum": 1 },
+        "line_end": { "type": "integer", "minimum": 1 },
+        "quote": { "type": "string", "minLength": 1 }
+      }
+    },
+    "businessIdentifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["property_iri", "value"],
+      "properties": {
+        "property_iri": { "type": "string", "format": "uri" },
+        "value": { "type": "string", "minLength": 1 }
+      }
+    },
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_id", "class_iri", "name", "business_identifier", "evidence"],
+      "properties": {
+        "candidate_id": { "type": "string", "pattern": "^[A-Za-z0-9_.:-]+\\.entity\\.[0-9]{3}$" },
+        "class_iri": { "type": "string", "format": "uri" },
+        "name": { "type": "string", "minLength": 1 },
+        "business_identifier": {
+          "oneOf": [{ "$ref": "#/$defs/businessIdentifier" }, { "type": "null" }]
+        },
+        "evidence": { "$ref": "#/$defs/evidence" }
+      }
+    },
+    "ambiguity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ambiguity_id", "candidate_id", "field", "mention", "alternatives", "reason", "evidence"],
+      "properties": {
+        "ambiguity_id": { "type": "string", "pattern": "^[A-Za-z0-9_.:-]+\\.ambiguity\\.[0-9]{3}$" },
+        "candidate_id": {
+          "oneOf": [
+            { "type": "string", "pattern": "^[A-Za-z0-9_.:-]+\\.entity\\.[0-9]{3}$" },
+            { "type": "null" }
+          ]
+        },
+        "field": { "enum": ["name", "class_iri", "business_identifier"] },
+        "mention": { "type": "string", "minLength": 1 },
+        "alternatives": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "reason": { "type": "string", "minLength": 1 },
+        "evidence": { "$ref": "#/$defs/evidence" }
+      }
+    },
+    "failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "detail"],
+      "properties": {
+        "code": {
+          "enum": ["INPUT_INCOMPLETE", "SCHEMA_CARD_INCONSISTENT", "CHUNK_PROVENANCE_INCONSISTENT"]
+        },
+        "detail": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

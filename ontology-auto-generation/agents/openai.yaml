@@ -1,0 +1,4 @@
+interface:
+  display_name: "OntologyAutoGeneration"
+  short_description: "从 Markdown 生成并验证带实例证据的 OWL TBox+ABox"
+  default_prompt: "Use $ontology-auto-generation to generate a validated OWL TBox, extract grounded ABox instances from these Markdown documents, and preserve evidence sidecars."

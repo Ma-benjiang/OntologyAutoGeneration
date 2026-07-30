@@ -1,0 +1,264 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix profile: <https://example.org/shapes/owl-output#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+profile:OntologyGraphShape
+    a sh:NodeShape ;
+    sh:targetClass owl:Ontology ;
+    sh:nodeKind sh:IRI ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:sparql [
+        sh:message "最终图禁止匿名节点和 RDF Collection"@zh ;
+        sh:select """
+            SELECT $this WHERE {
+                ?subject ?predicate ?object .
+                FILTER (isBlank(?subject) || isBlank(?predicate) || isBlank(?object))
+            }
+        """
+    ] ;
+    sh:sparql [
+        sh:message "最终图包含未声明或不受支持的谓语"@zh ;
+        sh:select """
+            SELECT $this WHERE {
+                ?subject ?predicate ?object .
+                FILTER (?predicate NOT IN (
+                    rdf:type, rdfs:label, rdfs:comment, rdfs:subClassOf,
+                    rdfs:subPropertyOf, rdfs:domain, rdfs:range,
+                    owl:inverseOf, owl:equivalentClass,
+                    owl:equivalentProperty, owl:disjointWith
+                ))
+                FILTER NOT EXISTS {
+                    ?predicate rdf:type ?propertyType .
+                    FILTER (?propertyType IN (owl:ObjectProperty, owl:DatatypeProperty))
+                }
+            }
+        """
+    ] ;
+    sh:sparql [
+        sh:message "rdf:type 对象必须是支持的声明类型或已声明 Class"@zh ;
+        sh:select """
+            SELECT $this WHERE {
+                ?subject rdf:type ?type .
+                FILTER (?type NOT IN (
+                    owl:Ontology, owl:Class, owl:ObjectProperty,
+                    owl:DatatypeProperty, owl:NamedIndividual
+                ))
+                FILTER NOT EXISTS { ?type rdf:type owl:Class . }
+            }
+        """
+    ] ;
+    sh:sparql [
+        sh:message "ObjectProperty/DatatypeProperty 断言主语必须是 NamedIndividual"@zh ;
+        sh:select """
+            SELECT $this WHERE {
+                ?subject ?property ?object .
+                ?property rdf:type ?propertyType .
+                FILTER (?propertyType IN (owl:ObjectProperty, owl:DatatypeProperty))
+                FILTER NOT EXISTS { ?subject rdf:type owl:NamedIndividual . }
+            }
+        """
+    ] ;
+    sh:sparql [
+        sh:message "同一本地名不能映射到多个 IRI"@zh ;
+        sh:select """
+            SELECT $this WHERE {
+                ?left rdf:type ?leftType .
+                ?right rdf:type ?rightType .
+                FILTER (?leftType IN (owl:Class, owl:ObjectProperty, owl:DatatypeProperty, owl:NamedIndividual))
+                FILTER (?rightType IN (owl:Class, owl:ObjectProperty, owl:DatatypeProperty, owl:NamedIndividual))
+                FILTER (?left != ?right)
+                BIND (REPLACE(STR(?left), "^.*[#/]", "") AS ?leftLocal)
+                BIND (REPLACE(STR(?right), "^.*[#/]", "") AS ?rightLocal)
+                FILTER (?leftLocal = ?rightLocal)
+            }
+        """
+    ] .
+
+profile:OntologyTermNameShape
+    a sh:NodeShape ;
+    sh:targetClass owl:Class ;
+    sh:targetClass owl:ObjectProperty ;
+    sh:targetClass owl:DatatypeProperty ;
+    sh:targetClass owl:NamedIndividual ;
+    sh:nodeKind sh:IRI ;
+    sh:pattern "[#/][A-Za-z][A-Za-z0-9_]*$" ;
+    sh:message "Ontology Term 和 NamedIndividual 必须使用合法英文 IRI 本地名"@zh .
+
+profile:ClassShape
+    a sh:NodeShape ;
+    sh:targetClass owl:Class ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:nodeKind sh:Literal ;
+        sh:message "owl:Class 必须至少有一个文本 rdfs:label"@zh
+    ] ;
+    sh:property [
+        sh:path rdfs:comment ;
+        sh:minCount 1 ;
+        sh:nodeKind sh:Literal ;
+        sh:message "owl:Class 必须提供文本 rdfs:comment"@zh
+    ] ;
+    sh:property [
+        sh:path rdfs:subClassOf ;
+        sh:nodeKind sh:IRI ;
+        sh:class owl:Class ;
+        sh:message "rdfs:subClassOf 对象必须是已声明 Class"@zh
+    ] ;
+    sh:property [
+        sh:path owl:equivalentClass ;
+        sh:nodeKind sh:IRI ;
+        sh:class owl:Class ;
+        sh:message "owl:equivalentClass 对象必须是已声明 Class"@zh
+    ] ;
+    sh:property [
+        sh:path owl:disjointWith ;
+        sh:nodeKind sh:IRI ;
+        sh:class owl:Class ;
+        sh:message "owl:disjointWith 对象必须是已声明 Class"@zh
+    ] ;
+    sh:sparql [
+        sh:message "rdfs:subClassOf 不得形成环"@zh ;
+        sh:select "SELECT $this WHERE { $this rdfs:subClassOf+ $this . }"
+    ] ;
+    sh:sparql [
+        sh:message "Class 不能同时继承互斥父类"@zh ;
+        sh:select """
+            SELECT $this WHERE {
+                $this rdfs:subClassOf* ?left .
+                $this rdfs:subClassOf* ?right .
+                { ?left owl:disjointWith ?right . }
+                UNION
+                { ?right owl:disjointWith ?left . }
+            }
+        """
+    ] .
+
+profile:ObjectPropertyShape
+    a sh:NodeShape ;
+    sh:targetClass owl:ObjectProperty ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:path rdfs:label ; sh:minCount 1 ; sh:nodeKind sh:Literal ] ;
+    sh:property [ sh:path rdfs:comment ; sh:minCount 1 ; sh:nodeKind sh:Literal ] ;
+    sh:property [
+        sh:path rdfs:domain ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ; sh:class owl:Class ;
+        sh:message "ObjectProperty 必须有且仅有一个已声明 Class domain"@zh
+    ] ;
+    sh:property [
+        sh:path rdfs:range ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ; sh:class owl:Class ;
+        sh:message "ObjectProperty 必须有且仅有一个已声明 Class range"@zh
+    ] ;
+    sh:property [ sh:path rdfs:subPropertyOf ; sh:class owl:ObjectProperty ] ;
+    sh:property [ sh:path owl:inverseOf ; sh:class owl:ObjectProperty ] ;
+    sh:property [ sh:path owl:equivalentProperty ; sh:class owl:ObjectProperty ] .
+
+profile:DatatypePropertyShape
+    a sh:NodeShape ;
+    sh:targetClass owl:DatatypeProperty ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:path rdfs:label ; sh:minCount 1 ; sh:nodeKind sh:Literal ] ;
+    sh:property [ sh:path rdfs:comment ; sh:minCount 1 ; sh:nodeKind sh:Literal ] ;
+    sh:property [
+        sh:path rdfs:domain ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ; sh:class owl:Class ;
+        sh:message "DatatypeProperty 必须有且仅有一个已声明 Class domain"@zh
+    ] ;
+    sh:property [
+        sh:path rdfs:range ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:pattern "^http://www\\.w3\\.org/2001/XMLSchema#[A-Za-z][A-Za-z0-9_]*$" ;
+        sh:message "DatatypeProperty 必须有且仅有一个 XSD IRI range"@zh
+    ] ;
+    sh:property [ sh:path rdfs:subPropertyOf ; sh:class owl:DatatypeProperty ] ;
+    sh:property [ sh:path owl:equivalentProperty ; sh:class owl:DatatypeProperty ] .
+
+profile:NamedIndividualShape
+    a sh:NodeShape ;
+    sh:targetClass owl:NamedIndividual ;
+    sh:nodeKind sh:IRI ;
+    sh:property [
+        sh:path rdf:type ;
+        sh:qualifiedValueShape [ sh:class owl:Class ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:message "NamedIndividual 必须至少属于一个已声明 Class"@zh
+    ] ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:nodeKind sh:Literal ;
+        sh:message "NamedIndividual 必须提供文本 rdfs:label"@zh
+    ] ;
+    sh:sparql [
+        sh:message "NamedIndividual 只能使用已声明属性作为业务断言谓语"@zh ;
+        sh:select """
+            SELECT $this WHERE {
+                $this ?property ?value .
+                FILTER (?property NOT IN (rdf:type, rdfs:label, rdfs:comment))
+                FILTER NOT EXISTS { ?property rdf:type owl:ObjectProperty . }
+                FILTER NOT EXISTS { ?property rdf:type owl:DatatypeProperty . }
+            }
+        """
+    ] ;
+    sh:sparql [
+        sh:message "ObjectProperty 断言违反 domain 或 range"@zh ;
+        sh:select """
+            SELECT $this WHERE {
+                $this ?property ?value .
+                ?property rdf:type owl:ObjectProperty ;
+                          rdfs:domain ?domain ;
+                          rdfs:range ?range .
+                {
+                    FILTER NOT EXISTS {
+                        $this rdf:type ?actualDomain .
+                        ?actualDomain rdf:type owl:Class .
+                        ?actualDomain (rdfs:subClassOf|owl:equivalentClass|^owl:equivalentClass)* ?domain .
+                    }
+                }
+                UNION
+                {
+                    FILTER NOT EXISTS {
+                        ?value rdf:type owl:NamedIndividual ; rdf:type ?actualRange .
+                        ?actualRange rdf:type owl:Class .
+                        ?actualRange (rdfs:subClassOf|owl:equivalentClass|^owl:equivalentClass)* ?range .
+                    }
+                }
+            }
+        """
+    ] ;
+    sh:sparql [
+        sh:message "DatatypeProperty 断言值必须是与 range 一致的 typed literal"@zh ;
+        sh:select """
+            SELECT $this WHERE {
+                $this ?property ?value .
+                ?property rdf:type owl:DatatypeProperty ; rdfs:range ?range .
+                FILTER (!isLiteral(?value) || DATATYPE(?value) != ?range)
+            }
+        """
+    ] ;
+    sh:sparql [
+        sh:message "DatatypeProperty 断言违反 domain"@zh ;
+        sh:select """
+            SELECT $this WHERE {
+                $this ?property ?value .
+                ?property rdf:type owl:DatatypeProperty ; rdfs:domain ?domain .
+                FILTER NOT EXISTS {
+                    $this rdf:type ?actualDomain .
+                    ?actualDomain rdf:type owl:Class .
+                    ?actualDomain (rdfs:subClassOf|owl:equivalentClass|^owl:equivalentClass)* ?domain .
+                }
+            }
+        """
+    ] .

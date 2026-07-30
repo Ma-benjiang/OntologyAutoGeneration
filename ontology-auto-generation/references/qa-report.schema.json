@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/qa-report-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "evaluation_status", "coverage", "status", "round", "gates", "reason_codes", "gate_1_findings"],
+  "properties": {
+    "version": { "const": 1 },
+    "evaluation_status": { "enum": ["NOT_RUN", "COMPLETE"] },
+    "coverage": { "enum": ["UNKNOWN", "COMPLETE", "INCOMPLETE"] },
+    "status": { "enum": ["PASS", "FAIL"] },
+    "round": { "type": "integer", "minimum": 0, "maximum": 20 },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gate_1", "gate_2", "gate_3"],
+      "properties": {
+        "gate_1": { "enum": ["NOT_RUN", "PASS", "FAIL"] },
+        "gate_2": { "enum": ["NOT_RUN", "PASS", "FAIL"] },
+        "gate_3": { "enum": ["NOT_RUN", "PASS", "FAIL"] }
+      }
+    },
+    "reason_codes": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "gate_1_findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } }
+  },
+  "$defs": {
+    "finding": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reason_code", "target", "detail"],
+          "properties": {
+            "reason_code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+            "target": { "enum": ["CQ", "SRD", "SCHEMA_CARD", "UNLOCATED"] },
+            "detail": { "type": "string", "minLength": 1 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reason_code", "target", "chunk_id", "detail"],
+          "properties": {
+            "reason_code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+            "target": { "const": "ABOX_CHUNK" },
+            "chunk_id": { "type": "string", "minLength": 1 },
+            "detail": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    }
+  }
+}

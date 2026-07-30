@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/candidate-critic-output-v1.json",
+  "title": "ABox Candidate Critic Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "review_id", "status", "reviews", "batch_reextraction_requests"],
+  "properties": {
+    "version": { "const": 1 },
+    "review_id": { "type": "string", "pattern": "^review-v1-[0-9a-f]{64}$" },
+    "status": { "enum": ["complete", "request_reextraction"] },
+    "reviews": { "type": "array", "items": { "$ref": "#/$defs/review" } },
+    "batch_reextraction_requests": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/batchRequest" }
+    }
+  },
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "heading_path", "line_start", "line_end", "quote"],
+      "properties": {
+        "source": { "type": "string", "minLength": 1 },
+        "heading_path": { "type": "array", "items": { "type": "string" } },
+        "line_start": { "type": "integer", "minimum": 1 },
+        "line_end": { "type": "integer", "minimum": 1 },
+        "quote": { "type": "string", "minLength": 1 }
+      }
+    },
+    "candidateKind": { "enum": ["entity", "assertion"] },
+    "rejectReason": {
+      "enum": [
+        "NEGATED_ASSERTION",
+        "EXAMPLE_OR_HYPOTHETICAL",
+        "GENERIC_OR_NORMATIVE",
+        "UNSUPPORTED_BY_PRIMARY"
+      ]
+    },
+    "reextractionReason": {
+      "enum": [
+        "ENTITY_CLASS_MISMATCH",
+        "ENTITY_NAME_MISMATCH",
+        "ENTITY_IDENTIFIER_MISMATCH",
+        "ASSERTION_DIRECTION_MISMATCH",
+        "ASSERTION_SUBJECT_MISMATCH",
+        "ASSERTION_PROPERTY_MISMATCH",
+        "ASSERTION_OBJECT_OR_VALUE_MISMATCH",
+        "EVIDENCE_MISALIGNED"
+      ]
+    },
+    "review": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["candidate_id", "candidate_kind", "disposition"],
+          "properties": {
+            "candidate_id": { "type": "string", "minLength": 1 },
+            "candidate_kind": { "$ref": "#/$defs/candidateKind" },
+            "disposition": { "const": "retain" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["candidate_id", "candidate_kind", "disposition", "reason_code", "evidence"],
+          "properties": {
+            "candidate_id": { "type": "string", "minLength": 1 },
+            "candidate_kind": { "$ref": "#/$defs/candidateKind" },
+            "disposition": { "const": "reject" },
+            "reason_code": { "$ref": "#/$defs/rejectReason" },
+            "evidence": { "$ref": "#/$defs/evidence" },
+            "detail": { "type": "string", "minLength": 1 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["candidate_id", "candidate_kind", "disposition", "reason_code", "evidence"],
+          "properties": {
+            "candidate_id": { "type": "string", "minLength": 1 },
+            "candidate_kind": { "$ref": "#/$defs/candidateKind" },
+            "disposition": { "const": "request_reextraction" },
+            "reason_code": { "$ref": "#/$defs/reextractionReason" },
+            "evidence": { "$ref": "#/$defs/evidence" },
+            "detail": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    },
+    "batchRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_pass", "reason_code", "trigger_candidate_id", "evidence"],
+      "properties": {
+        "target_pass": { "enum": ["entity", "assertion"] },
+        "reason_code": { "enum": ["ENTITY_OMITTED", "ASSERTION_OMITTED"] },
+        "trigger_candidate_id": { "type": "null" },
+        "evidence": { "$ref": "#/$defs/evidence" },
+        "detail": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

@@ -1,0 +1,3 @@
+# Use conservative stable individual identities
+
+Individuals with a business identifier retain one identity across documents and rebuilds. Without a business identifier, identity is derived from the Source Document's workspace-relative POSIX path, class IRI, and normalized name; absolute paths, headings, and line numbers are excluded so machine location and ordinary edits do not rename the individual. Renaming the entity or moving its source creates a new identity, deliberately preferring possible duplicates over unsafe cross-document merges. Source Documents outside the workspace are rejected because they cannot provide a portable project-relative identity.

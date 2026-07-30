@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/evidence-record-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fact_id", "candidate_id", "candidate_kind", "status", "subject", "predicate", "object", "datatype", "evidence"],
+  "properties": {
+    "fact_id": { "type": "string", "pattern": "^(fact|alias)-v1-[0-9a-f]{64}$" },
+    "candidate_id": { "type": "string", "minLength": 1 },
+    "candidate_kind": { "enum": ["entity", "assertion"] },
+    "status": { "enum": ["admitted", "observed_alias"] },
+    "subject": { "type": "string", "format": "uri" },
+    "predicate": { "type": "string", "format": "uri" },
+    "object": { "type": "string" },
+    "datatype": { "oneOf": [{ "type": "string", "format": "uri" }, { "type": "null" }] },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "heading_path", "line_start", "line_end", "quote"],
+      "properties": {
+        "source": { "type": "string", "minLength": 1 },
+        "heading_path": { "type": "array", "items": { "type": "string" } },
+        "line_start": { "type": "integer", "minimum": 1 },
+        "line_end": { "type": "integer", "minimum": 1 },
+        "quote": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

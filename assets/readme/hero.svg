@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="ht hd">
+  <title id="ht">OntologyAutoGeneration — 从 Markdown 生成受约束的 OWL 本体</title>
+  <desc id="hd">将用户明确选定的 Markdown 文档重建为受约束的 OWL TBox+ABox 本体（ontology.owl），每个被接纳的事实附带原文证据，每个拒绝附带机器可读原因。</desc>
+  <defs>
+    <linearGradient id="hbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0E1A24"/>
+      <stop offset="1" stop-color="#0B141C"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="360" rx="24" fill="url(#hbg)"/>
+
+  <g transform="translate(56 70)">
+    <text x="0" y="0" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="18" letter-spacing="1" fill="#5BC8E7">模式引导的 OWL 本体生成</text>
+    <rect x="0" y="14" width="54" height="3" rx="1.5" fill="#5BC8E7"/>
+    <text x="0" y="74" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="50" font-weight="700" fill="#E8F0F7" letter-spacing="-0.5">OntologyAutoGeneration</text>
+    <text x="0" y="120" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="23" fill="#8FA3B5">将选定的 Markdown 重建为</text>
+    <text x="0" y="152" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="23" fill="#8FA3B5">受约束、可溯源的 OWL 知识库。</text>
+    <text x="0" y="224" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="15.5" fill="#E8F0F7c7">Python · rdflib · OWL-RL · pySHACL · JSON Schema</text>
+  </g>
+
+  <g transform="translate(720 48)">
+    <rect width="424" height="276" rx="16" fill="#16242F" stroke="#2A3C4A"/>
+    <circle cx="26" cy="34" r="5" fill="#4DD58B"/>
+    <text x="42" y="40" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="18" fill="#E8F0F7">ontology.owl</text>
+    <g transform="translate(286 20)">
+      <rect width="118" height="28" rx="14" fill="#4DD58B29" stroke="#4DD58B99"/>
+      <text x="59" y="19" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12.5" fill="#4DD58B" letter-spacing="0.6">3-GATE · PASS</text>
+    </g>
+    <line x1="20" y1="58" x2="404" y2="58" stroke="#2A3C4A"/>
+    <g font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="16">
+      <text x="24" y="92"><tspan fill="#5BC8E7">&lt;rdf:Description</tspan> <tspan fill="#8FA3B5">about="…#I_3d72…"</tspan><tspan fill="#5BC8E7">&gt;</tspan></text>
+      <text x="24" y="120">&#160;&#160;<tspan fill="#5BC8E7">&lt;rdf:type</tspan> <tspan fill="#8FA3B5">resource="…#SalesOrder"</tspan><tspan fill="#5BC8E7">/&gt;</tspan></text>
+      <text x="24" y="148">&#160;&#160;<tspan fill="#5BC8E7">&lt;ont:orderNumber&gt;</tspan><tspan fill="#F2B964">SO-1001</tspan><tspan fill="#5BC8E7">&lt;/…&gt;</tspan></text>
+      <text x="24" y="176"><tspan fill="#5BC8E7">&lt;/rdf:Description&gt;</tspan></text>
+    </g>
+    <g transform="translate(20 204)">
+      <rect width="384" height="32" rx="8" fill="#F2B96421" stroke="#F2B96480"/>
+      <text x="14" y="21" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="14" fill="#F2B964">▮ evidence.jsonl · orders.md:3</text>
+    </g>
+    <text x="20" y="262" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" fill="#8FA3B5d9">2 个类 · 3 个属性 · 4 个实例 · 40 三元组</text>
+  </g>
+</svg>
